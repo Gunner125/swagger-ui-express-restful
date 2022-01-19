@@ -17,8 +17,8 @@ exports.writeSuccess = function (response, objMessage) {
 exports.writeError = function (response, objMessage) {
     var objResponse = {};
 
-    objResponse.code = objMessage.responseCode;
-    objResponse.message = objMessage.responseMessage;
+    objResponse.code = objMessage.status;
+    objResponse.message = objMessage.message;
 
     // console.log('Error ' + JSON.stringify(objResponse))
     response.setHeader('Content-Type', 'application/json');

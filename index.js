@@ -1,16 +1,14 @@
 const express = require("express");
-const path = require('path');
 const cors = require('cors');
+const expressJSDocSwagger = require('express-jsdoc-swagger');
 const app = express();
-const swaggerJsDoc = require('swagger-jsdoc');
-const swaggerUi = require('swagger-ui-express');
+const mongo = require('./connector/mongodb');
 
 const port = process.env.PORT || 8888;
 
-const usersRouter = require('./routes/user');
+const customerRoute = require('./routes/customer-route');
 
-const swaggerDefinition = {
-    openapi: '3.0.0',
+const options = {
     info: {
         title: 'Express API for JSONPlaceholder',
         version: '1.0.0',
@@ -24,29 +22,34 @@ const swaggerDefinition = {
             name: 'Nattapon(Pae,เป้)'
         },
     },
+    baseDir: __dirname,
+    swaggerUIPath: '/api-docs',
+    filesPattern: './routes/*.js',
     servers: [
         {
             url: 'http://localhost:8888',
-            description: 'Development server',
+            description: 'Development server port',
         },
     ]
 };
 
-const options = {
-    swaggerDefinition,
-    apis: ['./routes/*.js'],
-};
-
-const swaggerDocs = swaggerJsDoc(options);
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
-app.use(express.static(path.join(__dirname, 'public')));
 
-app.use('/users', usersRouter);
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 
-app.listen(port, () => {
-    console.log('Your server is listening on port %d (http://localhost:%d)', port, port);
-    console.log('Swagger-ui is available on http://localhost:%d/api-docs', port);
+app.use('/customer', customerRoute);
+
+expressJSDocSwagger(app)(options);
+
+mongo.mongo((db) => {
+    if (db !== false) {
+        // Initialize the Swagger middleware
+        app.listen(port, () => {
+            console.log('Your server is listening on port %d (http://localhost:%d)', port, port);
+            console.log('Swagger-ui is available on http://localhost:%d/api-docs', port);
+        });
+    } else {
+        throw 'mongo database error';
+    }
 });
