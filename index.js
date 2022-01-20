@@ -7,6 +7,7 @@ const mongo = require('./connector/mongodb');
 const port = process.env.PORT || 8888;
 
 const customerRoute = require('./routes/customer-route');
+const adminRoute = require('./routes/admin-route');
 
 const options = {
     info: {
@@ -39,6 +40,8 @@ app.use(express.urlencoded({ extended: false }));
 
 
 app.use('/customer', customerRoute);
+app.use('/admin', adminRoute);
+// app.use('/admin', adminRoute);
 
 expressJSDocSwagger(app)(options);
 
