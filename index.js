@@ -1,13 +1,16 @@
 const express = require("express");
 const cors = require('cors');
 const expressJSDocSwagger = require('express-jsdoc-swagger');
-const app = express();
 const mongo = require('./connector/mongodb');
+const cookieParser = require("cookie-parser");
+
+const app = express();
 
 const port = process.env.PORT || 8888;
 
-const customerRoute = require('./routes/customer-route');
-const adminRoute = require('./routes/admin-route');
+const customerRoute = require('./routes/customer.route');
+const userRoute = require('./routes/user.route');
+const authRoute = require('./routes/auth.route');
 
 const options = {
     info: {
@@ -21,6 +24,13 @@ const options = {
         },
         contact: {
             name: 'Nattapon(Pae,เป้)'
+        },
+    },
+    security: {
+        cookieAuth: {
+            type: 'apiKey',
+            name: 'accessToken',
+            in: 'cookies'
         },
     },
     baseDir: __dirname,
@@ -37,16 +47,19 @@ const options = {
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+app.use(cookieParser());
+app.use(express.static(__dirname));
 
 
 app.use('/customer', customerRoute);
-app.use('/admin', adminRoute);
-// app.use('/admin', adminRoute);
+app.use('/user', userRoute);
+app.use('/auth', authRoute);
 
 expressJSDocSwagger(app)(options);
 
 mongo.mongo((db) => {
     if (db !== false) {
+        console.log('MongoDB Connected');
         // Initialize the Swagger middleware
         app.listen(port, () => {
             console.log('Your server is listening on port %d (http://localhost:%d)', port, port);

@@ -1,17 +1,14 @@
-exports.writeSuccess = function (response, objMessage) {
+exports.writeSuccess = function (response, objSend) {
     var objResponse = {};
 
-    objResponse.code = objMessage.status;
-    objResponse.message = objMessage.message;
+    objResponse.code = objSend.status;
+    objResponse.message = objSend.message;
 
-    if (objMessage.data) objResponse.data = objMessage.data;
-    // if (objMessage.token) objResponse.token = objMessage.token
-    // if (objMessage.newToken) objResponse.newToken = objMessage.newToken
+    if (objSend.data) objResponse.data = objSend.data;
 
-    // console.log('Success ' + JSON.stringify(objResponse))
     response.setHeader('Content-Type', 'application/json');
     response.status(objResponse.code);
-    response.json({ code: objResponse.code, message: objResponse.message });
+    response.json(objResponse);
 };
 
 exports.writeError = function (response, objMessage) {
@@ -20,7 +17,6 @@ exports.writeError = function (response, objMessage) {
     objResponse.code = objMessage.status;
     objResponse.message = objMessage.message;
 
-    // console.log('Error ' + JSON.stringify(objResponse))
     response.setHeader('Content-Type', 'application/json');
     response.status(200);
     response.json(objResponse);
